@@ -1,0 +1,30 @@
+[gd_scene load_steps=2 format=2]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends TextureButton
+
+func _pressed():
+	print(\"start\")"
+
+[node name="Main" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Bg" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color( 0.027451, 0.027451, 0.027451, 1 )
+
+[node name="Start" type="TextureButton" parent="."]
+margin_left = 377.0
+margin_top = 209.0
+margin_right = 532.0
+margin_bottom = 249.0
+script = SubResource( 1 )
+
+[node name="Label" type="Label" parent="Start"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+text = "Start"
+align = 1
+valign = 1
