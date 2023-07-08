@@ -1,4 +1,4 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=4 format=2]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends ColorRect
@@ -19,6 +19,15 @@ interpolation_mode = 1
 offsets = PoolRealArray( 0, 0.205426, 0.437984, 0.686047 )
 colors = PoolColorArray( 1, 1, 1, 1, 1, 0.257813, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1 )
 
+[sub_resource type="GDScript" id=3]
+script/source = "extends Label
+
+func _gui_input(event):
+	if event is InputEventMouseButton:
+		if event.is_pressed() and event.button_index == BUTTON_LEFT:
+			get_tree().change_scene(\"res://Main.tscn\")
+"
+
 [node name="GameOver" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -35,13 +44,10 @@ script = SubResource( 1 )
 grad = SubResource( 2 )
 
 [node name="Label" type="Label" parent="."]
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-margin_left = -217.0
-margin_top = -55.0
-margin_right = -128.0
-margin_bottom = -39.0
-rect_scale = Vector2( 5, 5 )
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 0
 text = "GAME OVER"
+align = 1
+valign = 1
+script = SubResource( 3 )

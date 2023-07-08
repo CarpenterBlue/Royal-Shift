@@ -21,7 +21,7 @@ _global_script_class_icons={
 [application]
 
 config/name="GMTK23"
-run/main_scene="res://Loop.tscn"
+run/main_scene="res://Main.tscn"
 boot_splash/show_image=false
 boot_splash/bg_color=Color( 0, 0, 0, 1 )
 config/icon="res://icon.png"

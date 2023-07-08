@@ -1,6 +1,5 @@
-[gd_scene load_steps=35 format=2]
+[gd_scene load_steps=38 format=2]
 
-[ext_resource path="res://Locations/BaseLocation.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Loop/YellowTile.png" type="Texture" id=2]
 [ext_resource path="res://Player/Player.tscn" type="PackedScene" id=3]
 [ext_resource path="res://WallOfFire/HandsA3.png" type="Texture" id=4]
@@ -17,6 +16,7 @@
 [ext_resource path="res://WallOfFire/HandsA4.png" type="Texture" id=15]
 [ext_resource path="res://Items/ItemScimitar.tscn" type="PackedScene" id=16]
 [ext_resource path="res://Party/Slot.png" type="Texture" id=17]
+[ext_resource path="res://WallOfFire/BG.png" type="Texture" id=18]
 
 [sub_resource type="GDScript" id=3]
 script/source = "extends Area2D
@@ -26,6 +26,9 @@ export var spd = 5
 func _process(delta):
 	if visible:
 		position.x += spd * delta
+		
+
+		
 
 func _ready():
 	connect(\"body_entered\",self,\"on_body_entered\")
@@ -38,7 +41,6 @@ func on_body_entered(body):
 		Events.emit_signal(\"game_over\")
 
 func on_player_took_damage(val):
-	print(val)
 	if typeof(val) == TYPE_INT or typeof(val) == TYPE_REAL:
 		position.x += val
 		
@@ -46,6 +48,26 @@ func on_player_took_damage(val):
 
 [sub_resource type="RectangleShape2D" id=2]
 extents = Vector2( 189.5, 362.5 )
+
+[sub_resource type="GDScript" id=22]
+script/source = "extends ColorRect
+
+onready var player = $\"%Player\"
+
+func _process(delta):
+	var time = Time.get_ticks_msec()
+	var i = 0
+	
+	for hand in get_children():
+		var f = 12
+		if i % 3:
+			hand.offset.x = sin((time+i*50) * 0.01) * 4 + f
+		else:
+			hand.offset.x = sin((time+i*20) * 0.01) * 4 + f
+#			hand.look_at(player.global_position)
+		i += 1
+		
+"
 
 [sub_resource type="SpriteFrames" id=17]
 animations = [ {
@@ -70,6 +92,20 @@ animations = [ {
 "name": "default",
 "speed": 5.0
 } ]
+
+[sub_resource type="Shader" id=26]
+code = "shader_type canvas_item;
+
+void fragment(){
+	vec2 uv = UV;
+	vec2 offset = vec2(0,-TIME*.25);
+	vec4 tex = texture(TEXTURE,uv+offset);
+	COLOR = tex;
+	
+}"
+
+[sub_resource type="ShaderMaterial" id=27]
+shader = SubResource( 26 )
 
 [sub_resource type="GDScript" id=5]
 script/source = "extends Camera2D
@@ -179,15 +215,19 @@ func _process(delta):
 [sub_resource type="GDScript" id=20]
 script/source = "extends GridContainer
 
+func _enter_tree():
+	hide()
+
 func _ready():
 	Events.connect(\"reset_inventory\",self,\"show\")
+	Events.connect(\"battle_ended\",self,\"hide\")
 "
 
 [sub_resource type="GDScript" id=21]
 script/source = "extends Control
 
 func _gui_input(event):
-	if event is InputEventMouseButton and event.is_pressed():
+	if event is InputEventMouseButton and event.is_pressed() and event.button_index == BUTTON_LEFT:
 		var data = get_viewport().get_meta(\"drag\",false)
 		print(2)
 		
@@ -210,15 +250,12 @@ stretch_mode = 2
 
 [node name="Ysort" type="YSort" parent="."]
 
-[node name="Location" parent="Ysort" instance=ExtResource( 1 )]
-position = Vector2( 261, 260 )
-
 [node name="Player" parent="Ysort" instance=ExtResource( 3 )]
+unique_name_in_owner = true
 position = Vector2( 84, 270 )
 
 [node name="Force" type="Area2D" parent="."]
 unique_name_in_owner = true
-visible = false
 script = SubResource( 3 )
 spd = 10
 
@@ -230,6 +267,7 @@ shape = SubResource( 2 )
 margin_left = -1127.0
 margin_top = -160.0
 margin_bottom = 606.0
+script = SubResource( 22 )
 
 [node name="AnimatedSprite" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1142, 168 )
@@ -514,6 +552,15 @@ frames = SubResource( 19 )
 speed_scale = 2.0
 playing = true
 
+[node name="TextureRect" type="TextureRect" parent="Force"]
+material = SubResource( 27 )
+margin_left = -30.0
+margin_top = -2.0
+margin_right = 33.0
+margin_bottom = 554.0
+texture = ExtResource( 18 )
+stretch_mode = 2
+
 [node name="Camera" type="Camera2D" parent="."]
 visible = false
 offset = Vector2( -480, 0 )
@@ -564,9 +611,9 @@ layer = 3
 anchor_left = 0.5
 anchor_right = 0.5
 margin_left = -403.0
-margin_top = 512.0
+margin_top = 16.0
 margin_right = 397.0
-margin_bottom = 528.0
+margin_bottom = 32.0
 custom_styles/fg = SubResource( 13 )
 custom_styles/bg = SubResource( 14 )
 max_value = 800.0
@@ -578,10 +625,10 @@ script = SubResource( 16 )
 script = SubResource( 15 )
 
 [node name="PlayerInventory" type="GridContainer" parent="GUI"]
-margin_left = 24.0
-margin_top = 340.0
-margin_right = 257.0
-margin_bottom = 496.0
+margin_left = 13.0
+margin_top = 371.0
+margin_right = 246.0
+margin_bottom = 527.0
 columns = 3
 script = SubResource( 20 )
 

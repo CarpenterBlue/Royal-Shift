@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=2]
+[gd_scene load_steps=15 format=2]
 
 [ext_resource path="res://Characters/Enemy.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Characters/Visuals/PyramimicArt.png" type="Texture" id=2]
@@ -11,7 +11,8 @@ script/source = "extends CanvasLayer
 
 func _ready():
 	Events.connect(\"game_over\",self,\"queue_free\")
-
+	Events.emit_signal(\"reset_inventory\")
+	
 #	get_tree().current_scene.get_node(\"GUI\").add_child()
 "
 
@@ -37,6 +38,16 @@ interpolation_mode = 1
 offsets = PoolRealArray( 0, 0.186508, 0.589286, 0.85119 )
 colors = PoolColorArray( 1, 1, 1, 1, 1, 0.214844, 0.214844, 1, 0.17395, 0, 0.292969, 1, 0.00784314, 0, 0.0627451, 1 )
 
+[sub_resource type="GDScript" id=13]
+script/source = "extends Position2D
+
+
+func _process(delta):
+	var time = Time.get_ticks_msec()
+	
+	scale.y = sin(time*.02) * .005 + 1
+"
+
 [sub_resource type="SpriteFrames" id=8]
 animations = [ {
 "frames": [ ExtResource( 2 ), ExtResource( 5 ) ],
@@ -48,11 +59,15 @@ animations = [ {
 [sub_resource type="GDScript" id=12]
 script/source = "extends AnimatedSprite
 
-onready var p = get_parent()
+onready var p = get_parent().get_parent()
 
 func _process(delta):
 	if p.hp <= p.max_hp / 2.0:
 		frame = 1
+		offset.x = rand_range(-1,1)
+		offset.y = rand_range(-1,1)
+		
+
 "
 
 [sub_resource type="GDScript" id=3]
@@ -65,7 +80,8 @@ func _gui_input(event):
 		var data = get_viewport().get_meta(\"drag\",false)
 		if data:
 			if is_instance_valid(enemy):
-				data.use($\"%Enemy\")
+				if data.has_method(\"use\"):
+					data.use($\"%Enemy\")
 				data.show()
 				data.get_parent()
 				get_viewport().set_meta(\"drag\",false)
@@ -104,19 +120,8 @@ func _pressed():
 	if get_viewport().get_meta(\"drag\",false):
 		return
 	
-	if finished:
-		owner.queue_free()
-		Events.emit_signal(\"battle_ended\")
-	
-	if is_instance_valid(enemy):
-		Events.emit_signal(\"turn_passed\")
-	else:
-		finished = true
-		var t = create_tween()
-		t.set_ease(Tween.EASE_OUT)
-		t.set_trans(Tween.TRANS_CUBIC)
-		t.tween_property($\"%Rewards\",\"position:y\",0,.35)
-		t.tween_callback(Events,\"emit_signal\",[\"reset_inventory\"])
+	owner.queue_free()
+	Events.emit_signal(\"battle_ended\")
 "
 
 [node name="BattleScreen" type="CanvasLayer"]
@@ -137,8 +142,14 @@ grad = SubResource( 11 )
 [node name="Enemy" parent="." instance=ExtResource( 1 )]
 unique_name_in_owner = true
 
-[node name="PyramimicArt" type="AnimatedSprite" parent="Enemy"]
-position = Vector2( 472, 197 )
+[node name="Position" type="Position2D" parent="Enemy"]
+use_parent_material = true
+position = Vector2( 480, 335 )
+script = SubResource( 13 )
+
+[node name="PyramimicArt" type="AnimatedSprite" parent="Enemy/Position"]
+use_parent_material = true
+position = Vector2( -8, -138 )
 frames = SubResource( 8 )
 script = SubResource( 12 )
 
@@ -185,22 +196,23 @@ script = SubResource( 6 )
 
 [node name="ItemScimitar" parent="Rewards/Slot3" instance=ExtResource( 3 )]
 
-[node name="Pass" type="TextureButton" parent="."]
-margin_left = 764.0
-margin_top = 343.0
-margin_right = 923.0
-margin_bottom = 497.0
+[node name="Pass" type="TextureButton" parent="Rewards"]
+margin_left = 366.0
+margin_top = 307.0
+margin_right = 551.0
+margin_bottom = 341.0
 script = SubResource( 1 )
 
-[node name="ColorRect" type="ColorRect" parent="Pass"]
+[node name="ColorRect" type="ColorRect" parent="Rewards/Pass"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
 color = Color( 0.156863, 0.14902, 0.211765, 1 )
 
-[node name="Label" type="Label" parent="Pass"]
+[node name="Label" type="Label" parent="Rewards/Pass"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-text = "PASS THE TURN"
+text = "accept"
 align = 1
 valign = 1
+uppercase = true
