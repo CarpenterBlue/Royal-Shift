@@ -14,11 +14,12 @@ export var dmg = 15
 export(Curve) var curve
 
 onready var drop = $\"%Drop\"
+onready var sprite = get_child(0)
 
 func _ready():
-#	Events.connect(\"turn_passed\",self,\"attack\")
 	Events.connect(\"enemy_hit\",self,\"on_enemy_hit\")
-	var child = get_child(0)
+	var child = get_child(0) as AnimatedSprite
+
 	
 func _process(delta):
 	
@@ -45,13 +46,9 @@ func attack():
 func take_damage(val):
 	hp -= val
 	
-	
 	if hp <= 0:
 		kill()
 		return
-		
-	if hp <= max_hp / 2:
-		get_child(0).frame = 1
 	
 	var t = create_tween()
 	t.tween_method(self,\"bounce\",0.0,1.0,1)

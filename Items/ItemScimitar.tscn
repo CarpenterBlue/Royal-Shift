@@ -8,13 +8,24 @@ script/source = "extends InventoryItem
 var type = \"Scimitar\"
 var damage = 1
 
+func _gui_input(event):
+	if event is InputEventMouseButton and event.is_pressed():
+		print(1)
+		var data = get_viewport().get_meta(\"drag\",false)
+		if data:
+			if data != self and data.type == type:
+				upgrade(data)
+				data.queue_free()
+				get_viewport().set_meta(\"drag\",false)
+
 func use(enemy):
 	var node = preload(\"res://Effects/Slash.tscn\").instance()
 	enemy.get_parent().add_child(node)
 	enemy.take_damage(damage)
 
-func upgrade():
-	damage += 1
+func upgrade(data):
+	damage += data.damage
+	modulate = Color.red
 "
 
 [node name="ItemScimitar" type="Control"]

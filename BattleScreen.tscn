@@ -45,6 +45,16 @@ animations = [ {
 "speed": 5.0
 } ]
 
+[sub_resource type="GDScript" id=12]
+script/source = "extends AnimatedSprite
+
+onready var p = get_parent()
+
+func _process(delta):
+	if p.hp <= p.max_hp / 2.0:
+		frame = 1
+"
+
 [sub_resource type="GDScript" id=3]
 script/source = "extends Control
 
@@ -73,34 +83,14 @@ script/source = "extends Control
 func _gui_input(event):
 	if event is InputEventMouseButton and event.is_pressed():
 		var data = get_viewport().get_meta(\"drag\",false)
+		print(2)
+		
 		if data:
 			var p = data.get_parent()
 			p.remove_child(data)
 			add_child(data)
 			data.show()
 			get_viewport().set_meta(\"drag\",false)
-"
-
-[sub_resource type="GDScript" id=9]
-script/source = "extends GridContainer
-
-func _ready():
-	Events.connect(\"reset_inventory\",self,\"show\")
-	connect(\"child_entered_tree\",self,\"try_combine\")
-	
-func try_combine(new_item):
-	for slot in get_children():
-		if slot.get_child_count() > 0:
-			var item = slot.get_child(0)
-			if item.type == new_item:
-				if item.has_method(\"upgrade\"):
-					new_item.queue_free()
-					item.upgrade()
-					return
-					
-				
-				
-		
 "
 
 [sub_resource type="GDScript" id=1]
@@ -150,6 +140,7 @@ unique_name_in_owner = true
 [node name="PyramimicArt" type="AnimatedSprite" parent="Enemy"]
 position = Vector2( 472, 197 )
 frames = SubResource( 8 )
+script = SubResource( 12 )
 
 [node name="Drop" type="Control" parent="."]
 unique_name_in_owner = true
@@ -193,59 +184,6 @@ texture = ExtResource( 4 )
 script = SubResource( 6 )
 
 [node name="ItemScimitar" parent="Rewards/Slot3" instance=ExtResource( 3 )]
-
-[node name="PlayerInventory" type="GridContainer" parent="."]
-margin_left = 24.0
-margin_top = 340.0
-margin_right = 257.0
-margin_bottom = 496.0
-columns = 3
-script = SubResource( 9 )
-
-[node name="Slot" type="TextureRect" parent="PlayerInventory"]
-margin_right = 75.0
-margin_bottom = 76.0
-texture = ExtResource( 4 )
-script = SubResource( 6 )
-
-[node name="ItemScimitar" parent="PlayerInventory/Slot" instance=ExtResource( 3 )]
-
-[node name="Slot2" type="TextureRect" parent="PlayerInventory"]
-margin_left = 79.0
-margin_right = 154.0
-margin_bottom = 76.0
-texture = ExtResource( 4 )
-script = SubResource( 6 )
-
-[node name="Slot3" type="TextureRect" parent="PlayerInventory"]
-margin_left = 158.0
-margin_right = 233.0
-margin_bottom = 76.0
-texture = ExtResource( 4 )
-script = SubResource( 6 )
-
-[node name="Slot4" type="TextureRect" parent="PlayerInventory"]
-margin_top = 80.0
-margin_right = 75.0
-margin_bottom = 156.0
-texture = ExtResource( 4 )
-script = SubResource( 6 )
-
-[node name="Slot5" type="TextureRect" parent="PlayerInventory"]
-margin_left = 79.0
-margin_top = 80.0
-margin_right = 154.0
-margin_bottom = 156.0
-texture = ExtResource( 4 )
-script = SubResource( 6 )
-
-[node name="Slot6" type="TextureRect" parent="PlayerInventory"]
-margin_left = 158.0
-margin_top = 80.0
-margin_right = 233.0
-margin_bottom = 156.0
-texture = ExtResource( 4 )
-script = SubResource( 6 )
 
 [node name="Pass" type="TextureButton" parent="."]
 margin_left = 764.0
