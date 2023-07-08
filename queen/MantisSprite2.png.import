@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/MantisSprite2.png-c6023c4b28305b94ad9237d348366883.stex"
+path="res://.import/MantisSprite2.png-6407e2944f657232798cdf4c9fff868f.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://queen/MantisSprite2.png"
-dest_files=[ "res://.import/MantisSprite2.png-c6023c4b28305b94ad9237d348366883.stex" ]
+source_file="res://Queen/MantisSprite2.png"
+dest_files=[ "res://.import/MantisSprite2.png-6407e2944f657232798cdf4c9fff868f.stex" ]
 
 [params]
 

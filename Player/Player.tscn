@@ -3,9 +3,9 @@
 [ext_resource path="res://King/BeetleSprite3.png" type="Texture" id=1]
 [ext_resource path="res://King/BeetleSprite1.png" type="Texture" id=2]
 [ext_resource path="res://King/BeetleSprite2.png" type="Texture" id=3]
-[ext_resource path="res://queen/MantisSprite3.png" type="Texture" id=4]
-[ext_resource path="res://queen/MantisSprite2.png" type="Texture" id=5]
-[ext_resource path="res://queen/MantisSprite1.png" type="Texture" id=6]
+[ext_resource path="res://Queen/MantisSprite3.png" type="Texture" id=4]
+[ext_resource path="res://Queen/MantisSprite2.png" type="Texture" id=5]
+[ext_resource path="res://Queen/MantisSprite1.png" type="Texture" id=6]
 
 [sub_resource type="GDScript" id=4]
 script/source = "extends KinematicBody2D
@@ -94,7 +94,6 @@ position = Vector2( 0, -21 )
 shape = SubResource( 1 )
 
 [node name="King" type="AnimatedSprite" parent="."]
-visible = false
 position = Vector2( 1, -1 )
 frames = SubResource( 5 )
 playing = true
@@ -102,9 +101,9 @@ offset = Vector2( 4, -35 )
 script = SubResource( 6 )
 
 [node name="Queen" type="AnimatedSprite" parent="."]
+visible = false
 position = Vector2( 1, -1 )
 frames = SubResource( 7 )
-frame = 2
 playing = true
 offset = Vector2( 0, -35 )
 script = SubResource( 6 )

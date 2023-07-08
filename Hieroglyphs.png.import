@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/MantisSprite3.png-efb39f95f5c970dcbc625f0359432482.stex"
+path="res://.import/Hieroglyphs.png-2883855e939151863d0ea25f81eebbe9.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Queen/MantisSprite3.png"
-dest_files=[ "res://.import/MantisSprite3.png-efb39f95f5c970dcbc625f0359432482.stex" ]
+source_file="res://Hieroglyphs.png"
+dest_files=[ "res://.import/Hieroglyphs.png-2883855e939151863d0ea25f81eebbe9.stex" ]
 
 [params]
 
