@@ -27,6 +27,7 @@ var time = 0
 export var hp = 3
 var max_hp = hp
 export var dmg = 15
+export var enemy_name : String
 
 export(Curve) var curve
 
@@ -121,12 +122,13 @@ func _process(delta):
 func _draw():
 	var font = get_font(\"font\",\"default\")
 
-	draw_string(font,Vector2(0,-8),\"ENEMY\")
+	draw_string(font,Vector2(0,-8),owner.enemy_name.to_upper())
 "
 
 [node name="Enemy" type="Node2D"]
 material = SubResource( 3 )
 script = SubResource( 1 )
+enemy_name = "Pyramimic"
 curve = ExtResource( 2 )
 
 [node name="HeartBar" type="GridContainer" parent="."]

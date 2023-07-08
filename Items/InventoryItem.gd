@@ -18,5 +18,5 @@ func on_click(event):
 					data.queue_free()
 					get_viewport().set_meta("drag",false)
 		else:
-			hide()
 			get_viewport().set_meta("drag",self)
+			hide()

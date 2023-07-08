@@ -51,7 +51,11 @@ animations = [ {
 [sub_resource type="GDScript" id=6]
 script/source = "extends AnimatedSprite
 
-
+func _enter_tree():
+	if Global.cycle == name.to_lower():
+		show()
+	else:
+		hide()
 
 func _process(delta):
 	var time = Time.get_ticks_msec()
@@ -93,14 +97,15 @@ script = SubResource( 4 )
 position = Vector2( 0, -21 )
 shape = SubResource( 1 )
 
-[node name="King" type="AnimatedSprite" parent="."]
+[node name="Night" type="AnimatedSprite" parent="."]
 position = Vector2( 1, -1 )
 frames = SubResource( 5 )
+frame = 1
 playing = true
 offset = Vector2( 4, -35 )
 script = SubResource( 6 )
 
-[node name="Queen" type="AnimatedSprite" parent="."]
+[node name="Day" type="AnimatedSprite" parent="."]
 visible = false
 position = Vector2( 1, -1 )
 frames = SubResource( 7 )
