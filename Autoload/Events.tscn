@@ -1,0 +1,17 @@
+[gd_scene load_steps=2 format=2]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Node
+
+signal transition_requested()
+signal battle_ended()
+signal turn_passed()
+signal enemy_hit()
+signal reset_inventory()
+signal game_over()
+signal player_took_damage(val)
+signal cause_screen_shake()
+"
+
+[node name="Events" type="Node"]
+script = SubResource( 1 )

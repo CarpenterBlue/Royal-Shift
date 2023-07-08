@@ -1,0 +1,550 @@
+[gd_scene load_steps=31 format=2]
+
+[ext_resource path="res://Locations/BaseLocation.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Loop/YellowTile.png" type="Texture" id=2]
+[ext_resource path="res://Player/Player.tscn" type="PackedScene" id=3]
+[ext_resource path="res://WallOfFire/HandsA3.png" type="Texture" id=4]
+[ext_resource path="res://WallOfFire/HandsA2.png" type="Texture" id=5]
+[ext_resource path="res://WallOfFire/HandsB1.png" type="Texture" id=6]
+[ext_resource path="res://WallOfFire/HandsB2.png" type="Texture" id=7]
+[ext_resource path="res://WallOfFire/HandsB3.png" type="Texture" id=8]
+[ext_resource path="res://WallOfFire/HandsA1.png" type="Texture" id=9]
+[ext_resource path="res://WallOfFire/HandsC2.png" type="Texture" id=10]
+[ext_resource path="res://WallOfFire/HandsC1.png" type="Texture" id=11]
+[ext_resource path="res://WallOfFire/HandsB4.png" type="Texture" id=12]
+[ext_resource path="res://WallOfFire/HandsC4.png" type="Texture" id=13]
+[ext_resource path="res://WallOfFire/HandsC3.png" type="Texture" id=14]
+[ext_resource path="res://WallOfFire/HandsA4.png" type="Texture" id=15]
+
+[sub_resource type="GDScript" id=3]
+script/source = "extends Area2D
+
+export var spd = 5
+
+func _process(delta):
+	position.x += spd * delta
+
+func _ready():
+	connect(\"body_entered\",self,\"on_body_entered\")
+	Events.connect(\"player_took_damage\",self,\"on_player_took_damage\")
+	
+	
+func on_body_entered(body):
+	if body.name == \"Player\":
+		get_tree().change_scene(\"res://GameOver.tscn\")
+		Events.emit_signal(\"game_over\")
+
+func on_player_took_damage(val):
+	print(val)
+	if typeof(val) == TYPE_INT or typeof(val) == TYPE_REAL:
+		position.x += val
+		
+"
+
+[sub_resource type="RectangleShape2D" id=2]
+extents = Vector2( 189.5, 362.5 )
+
+[sub_resource type="SpriteFrames" id=17]
+animations = [ {
+"frames": [ ExtResource( 9 ), ExtResource( 5 ), ExtResource( 4 ), ExtResource( 15 ) ],
+"loop": true,
+"name": "default",
+"speed": 5.0
+} ]
+
+[sub_resource type="SpriteFrames" id=18]
+animations = [ {
+"frames": [ ExtResource( 6 ), ExtResource( 7 ), ExtResource( 8 ), ExtResource( 12 ) ],
+"loop": true,
+"name": "default",
+"speed": 5.0
+} ]
+
+[sub_resource type="SpriteFrames" id=19]
+animations = [ {
+"frames": [ ExtResource( 11 ), ExtResource( 10 ), ExtResource( 14 ), ExtResource( 13 ) ],
+"loop": true,
+"name": "default",
+"speed": 5.0
+} ]
+
+[sub_resource type="GDScript" id=5]
+script/source = "extends Camera2D
+
+onready var player = $\"%Player\"
+
+func _process(delta):
+	global_position.x = lerp(global_position.x,player.global_position.x,.05)
+	
+"
+
+[sub_resource type="GDScript" id=12]
+script/source = "extends CanvasLayer
+
+func _enter_tree():
+	show()
+"
+
+[sub_resource type="CanvasItemMaterial" id=8]
+blend_mode = 2
+
+[sub_resource type="GDScript" id=7]
+script/source = "extends Sprite
+
+export var radius := 1800.0
+onready var player = $\"%Player\"
+var state = \"state_normal\"
+
+export(PackedScene) var scene
+
+func _ready():
+	Events.connect(\"transition_requested\",self,\"play\")
+
+func play():
+	$AnimationPlayer.play(\"Trans\")
+
+func state_normal():
+	position.y = player.global_position.y
+	update()
+
+func _process(delta):
+	if has_method(state):
+		call(state)
+	
+func _draw():
+	draw_circle(Vector2(0,-40),radius,Color.black)
+"
+
+[sub_resource type="Animation" id=10]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/path = NodePath("Wipe:radius")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ 1800 ]
+}
+
+[sub_resource type="Animation" id=9]
+resource_name = "Trans"
+length = 3.0
+tracks/0/type = "value"
+tracks/0/path = NodePath("Wipe:radius")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 1.5, 3 ),
+"transitions": PoolRealArray( 0.0371627, 0.353554, 3.73213 ),
+"update": 0,
+"values": [ 1800, 0, 1800 ]
+}
+
+[sub_resource type="StyleBoxFlat" id=13]
+bg_color = Color( 0.282353, 0.372549, 0.439216, 1 )
+
+[sub_resource type="StyleBoxFlat" id=14]
+
+[sub_resource type="GDScript" id=16]
+script/source = "extends ProgressBar
+
+onready var force = $\"%Force\"
+
+func _process(delta):
+	value = force.position.x / float(owner.rect_size.x) * 800
+"
+
+[sub_resource type="GDScript" id=15]
+script/source = "extends Sprite
+
+onready var player = $\"%Player\"
+onready var p = get_parent()
+
+func _draw():
+	draw_circle(Vector2(0,8),5,Color.white)
+
+func _process(delta):
+	position.x = player.position.x / float(owner.rect_size.x) * p.rect_size.x
+"
+
+[node name="Loop" type="TextureRect"]
+self_modulate = Color( 0.407843, 0.470588, 1, 1 )
+margin_right = 1851.0
+margin_bottom = 540.0
+rect_min_size = Vector2( 1, 540 )
+texture = ExtResource( 2 )
+expand = true
+stretch_mode = 2
+
+[node name="Ysort" type="YSort" parent="."]
+
+[node name="Location" parent="Ysort" instance=ExtResource( 1 )]
+position = Vector2( 261, 260 )
+
+[node name="Player" parent="Ysort" instance=ExtResource( 3 )]
+position = Vector2( 84, 270 )
+
+[node name="Force" type="Area2D" parent="."]
+unique_name_in_owner = true
+script = SubResource( 3 )
+spd = 10
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Force"]
+position = Vector2( -190.5, 286.5 )
+shape = SubResource( 2 )
+
+[node name="ColorRect" type="ColorRect" parent="Force"]
+margin_left = -1127.0
+margin_top = -160.0
+margin_bottom = 606.0
+
+[node name="AnimatedSprite" type="AnimatedSprite" parent="Force/ColorRect"]
+position = Vector2( 1142, 168 )
+frames = SubResource( 17 )
+speed_scale = 2.0
+playing = true
+
+[node name="AnimatedSprite2" type="AnimatedSprite" parent="Force/ColorRect"]
+position = Vector2( 1142, 198 )
+frames = SubResource( 18 )
+speed_scale = 2.0
+playing = true
+
+[node name="AnimatedSprite3" type="AnimatedSprite" parent="Force/ColorRect"]
+position = Vector2( 1142, 224 )
+frames = SubResource( 19 )
+frame = 2
+speed_scale = 2.0
+playing = true
+
+[node name="AnimatedSprite4" type="AnimatedSprite" parent="Force/ColorRect"]
+position = Vector2( 1141, 252 )
+frames = SubResource( 17 )
+speed_scale = 2.0
+playing = true
+
+[node name="AnimatedSprite5" type="AnimatedSprite" parent="Force/ColorRect"]
+position = Vector2( 1141, 282 )
+frames = SubResource( 18 )
+speed_scale = 2.0
+playing = true
+
+[node name="AnimatedSprite6" type="AnimatedSprite" parent="Force/ColorRect"]
+position = Vector2( 1141, 308 )
+frames = SubResource( 19 )
+frame = 2
+speed_scale = 2.0
+playing = true
+
+[node name="AnimatedSprite7" type="AnimatedSprite" parent="Force/ColorRect"]
+position = Vector2( 1141, 339 )
+frames = SubResource( 17 )
+speed_scale = 2.0
+playing = true
+
+[node name="AnimatedSprite8" type="AnimatedSprite" parent="Force/ColorRect"]
+position = Vector2( 1141, 369 )
+frames = SubResource( 18 )
+speed_scale = 2.0
+playing = true
+
+[node name="AnimatedSprite9" type="AnimatedSprite" parent="Force/ColorRect"]
+position = Vector2( 1141, 395 )
+frames = SubResource( 19 )
+frame = 2
+speed_scale = 2.0
+playing = true
+
+[node name="AnimatedSprite10" type="AnimatedSprite" parent="Force/ColorRect"]
+position = Vector2( 1141, 428 )
+frames = SubResource( 17 )
+frame = 3
+speed_scale = 2.0
+playing = true
+
+[node name="AnimatedSprite11" type="AnimatedSprite" parent="Force/ColorRect"]
+position = Vector2( 1141, 458 )
+frames = SubResource( 18 )
+frame = 3
+speed_scale = 2.0
+playing = true
+
+[node name="AnimatedSprite12" type="AnimatedSprite" parent="Force/ColorRect"]
+position = Vector2( 1141, 484 )
+frames = SubResource( 19 )
+frame = 1
+speed_scale = 2.0
+playing = true
+
+[node name="AnimatedSprite13" type="AnimatedSprite" parent="Force/ColorRect"]
+position = Vector2( 1141, 513 )
+frames = SubResource( 17 )
+frame = 3
+speed_scale = 2.0
+playing = true
+
+[node name="AnimatedSprite14" type="AnimatedSprite" parent="Force/ColorRect"]
+position = Vector2( 1141, 543 )
+frames = SubResource( 18 )
+frame = 3
+speed_scale = 2.0
+playing = true
+
+[node name="AnimatedSprite15" type="AnimatedSprite" parent="Force/ColorRect"]
+position = Vector2( 1141, 569 )
+frames = SubResource( 19 )
+frame = 1
+speed_scale = 2.0
+playing = true
+
+[node name="AnimatedSprite16" type="AnimatedSprite" parent="Force/ColorRect"]
+position = Vector2( 1141, 601 )
+frames = SubResource( 17 )
+frame = 3
+speed_scale = 2.0
+playing = true
+
+[node name="AnimatedSprite17" type="AnimatedSprite" parent="Force/ColorRect"]
+position = Vector2( 1141, 631 )
+frames = SubResource( 18 )
+frame = 3
+speed_scale = 2.0
+playing = true
+
+[node name="AnimatedSprite18" type="AnimatedSprite" parent="Force/ColorRect"]
+position = Vector2( 1141, 657 )
+frames = SubResource( 19 )
+frame = 1
+speed_scale = 2.0
+playing = true
+
+[node name="AnimatedSprite19" type="AnimatedSprite" parent="Force/ColorRect"]
+position = Vector2( 1141, 687 )
+frames = SubResource( 17 )
+frame = 2
+speed_scale = 2.0
+playing = true
+
+[node name="AnimatedSprite20" type="AnimatedSprite" parent="Force/ColorRect"]
+position = Vector2( 1141, 717 )
+frames = SubResource( 18 )
+frame = 2
+speed_scale = 2.0
+playing = true
+
+[node name="AnimatedSprite21" type="AnimatedSprite" parent="Force/ColorRect"]
+position = Vector2( 1141, 743 )
+frames = SubResource( 19 )
+speed_scale = 2.0
+playing = true
+
+[node name="AnimatedSprite22" type="AnimatedSprite" parent="Force/ColorRect"]
+position = Vector2( 1130, 181 )
+frames = SubResource( 17 )
+speed_scale = 2.0
+playing = true
+
+[node name="AnimatedSprite23" type="AnimatedSprite" parent="Force/ColorRect"]
+position = Vector2( 1130, 211 )
+frames = SubResource( 18 )
+speed_scale = 2.0
+playing = true
+
+[node name="AnimatedSprite24" type="AnimatedSprite" parent="Force/ColorRect"]
+position = Vector2( 1130, 237 )
+frames = SubResource( 19 )
+frame = 1
+speed_scale = 2.0
+playing = true
+
+[node name="AnimatedSprite25" type="AnimatedSprite" parent="Force/ColorRect"]
+position = Vector2( 1129, 265 )
+frames = SubResource( 17 )
+frame = 3
+speed_scale = 2.0
+playing = true
+
+[node name="AnimatedSprite26" type="AnimatedSprite" parent="Force/ColorRect"]
+position = Vector2( 1129, 295 )
+frames = SubResource( 18 )
+frame = 3
+speed_scale = 2.0
+playing = true
+
+[node name="AnimatedSprite27" type="AnimatedSprite" parent="Force/ColorRect"]
+position = Vector2( 1129, 321 )
+frames = SubResource( 19 )
+frame = 1
+speed_scale = 2.0
+playing = true
+
+[node name="AnimatedSprite28" type="AnimatedSprite" parent="Force/ColorRect"]
+position = Vector2( 1129, 352 )
+frames = SubResource( 17 )
+frame = 3
+speed_scale = 2.0
+playing = true
+
+[node name="AnimatedSprite29" type="AnimatedSprite" parent="Force/ColorRect"]
+position = Vector2( 1129, 382 )
+frames = SubResource( 18 )
+frame = 3
+speed_scale = 2.0
+playing = true
+
+[node name="AnimatedSprite30" type="AnimatedSprite" parent="Force/ColorRect"]
+position = Vector2( 1129, 408 )
+frames = SubResource( 19 )
+frame = 1
+speed_scale = 2.0
+playing = true
+
+[node name="AnimatedSprite31" type="AnimatedSprite" parent="Force/ColorRect"]
+position = Vector2( 1129, 441 )
+frames = SubResource( 17 )
+frame = 2
+speed_scale = 2.0
+playing = true
+
+[node name="AnimatedSprite32" type="AnimatedSprite" parent="Force/ColorRect"]
+position = Vector2( 1129, 471 )
+frames = SubResource( 18 )
+frame = 2
+speed_scale = 2.0
+playing = true
+
+[node name="AnimatedSprite33" type="AnimatedSprite" parent="Force/ColorRect"]
+position = Vector2( 1129, 497 )
+frames = SubResource( 19 )
+speed_scale = 2.0
+playing = true
+
+[node name="AnimatedSprite34" type="AnimatedSprite" parent="Force/ColorRect"]
+position = Vector2( 1129, 526 )
+frames = SubResource( 17 )
+frame = 2
+speed_scale = 2.0
+playing = true
+
+[node name="AnimatedSprite35" type="AnimatedSprite" parent="Force/ColorRect"]
+position = Vector2( 1129, 556 )
+frames = SubResource( 18 )
+frame = 2
+speed_scale = 2.0
+playing = true
+
+[node name="AnimatedSprite36" type="AnimatedSprite" parent="Force/ColorRect"]
+position = Vector2( 1129, 582 )
+frames = SubResource( 19 )
+speed_scale = 2.0
+playing = true
+
+[node name="AnimatedSprite37" type="AnimatedSprite" parent="Force/ColorRect"]
+position = Vector2( 1129, 614 )
+frames = SubResource( 17 )
+frame = 2
+speed_scale = 2.0
+playing = true
+
+[node name="AnimatedSprite38" type="AnimatedSprite" parent="Force/ColorRect"]
+position = Vector2( 1129, 644 )
+frames = SubResource( 18 )
+frame = 2
+speed_scale = 2.0
+playing = true
+
+[node name="AnimatedSprite39" type="AnimatedSprite" parent="Force/ColorRect"]
+position = Vector2( 1129, 670 )
+frames = SubResource( 19 )
+speed_scale = 2.0
+playing = true
+
+[node name="AnimatedSprite40" type="AnimatedSprite" parent="Force/ColorRect"]
+position = Vector2( 1129, 700 )
+frames = SubResource( 17 )
+frame = 1
+speed_scale = 2.0
+playing = true
+
+[node name="AnimatedSprite41" type="AnimatedSprite" parent="Force/ColorRect"]
+position = Vector2( 1129, 730 )
+frames = SubResource( 18 )
+frame = 1
+speed_scale = 2.0
+playing = true
+
+[node name="AnimatedSprite42" type="AnimatedSprite" parent="Force/ColorRect"]
+position = Vector2( 1129, 756 )
+frames = SubResource( 19 )
+frame = 3
+speed_scale = 2.0
+playing = true
+
+[node name="Camera" type="Camera2D" parent="."]
+visible = false
+offset = Vector2( -480, 0 )
+anchor_mode = 0
+current = true
+script = SubResource( 5 )
+
+[node name="Transition" type="CanvasLayer" parent="."]
+layer = 2
+visible = false
+script = SubResource( 12 )
+
+[node name="ViewportContainer" type="ViewportContainer" parent="Transition"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="Viewport" type="Viewport" parent="Transition/ViewportContainer"]
+size = Vector2( 960, 540 )
+transparent_bg = true
+handle_input_locally = false
+render_target_update_mode = 0
+gui_disable_input = true
+
+[node name="Position2D" type="Position2D" parent="Transition/ViewportContainer/Viewport"]
+
+[node name="ColorRect" type="ColorRect" parent="Transition/ViewportContainer/Viewport/Position2D"]
+margin_right = 960.0
+margin_bottom = 540.0
+mouse_filter = 2
+color = Color( 0, 0, 0, 1 )
+
+[node name="Wipe" type="Sprite" parent="Transition/ViewportContainer/Viewport/Position2D"]
+material = SubResource( 8 )
+position = Vector2( 480, 270 )
+script = SubResource( 7 )
+radius = 1800
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Transition/ViewportContainer/Viewport/Position2D/Wipe"]
+root_node = NodePath("../..")
+anims/RESET = SubResource( 10 )
+anims/Trans = SubResource( 9 )
+
+[node name="GUI" type="CanvasLayer" parent="."]
+layer = 3
+
+[node name="ProgressBar" type="ProgressBar" parent="GUI"]
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = -403.0
+margin_top = 512.0
+margin_right = 397.0
+margin_bottom = 528.0
+custom_styles/fg = SubResource( 13 )
+custom_styles/bg = SubResource( 14 )
+max_value = 800.0
+value = 50.0
+percent_visible = false
+script = SubResource( 16 )
+
+[node name="PlayerThing" type="Sprite" parent="GUI/ProgressBar"]
+script = SubResource( 15 )

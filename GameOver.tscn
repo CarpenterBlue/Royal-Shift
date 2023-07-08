@@ -1,0 +1,47 @@
+[gd_scene load_steps=3 format=2]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends ColorRect
+
+export(Gradient) var grad
+
+func _ready():
+	var t = create_tween()
+	t.set_loops(2)
+	t.tween_method(self,\"flash\",0.0,1.0,.25)
+	
+func flash(val):
+	color = grad.interpolate(val)
+"
+
+[sub_resource type="Gradient" id=2]
+interpolation_mode = 1
+offsets = PoolRealArray( 0, 0.205426, 0.437984, 0.686047 )
+colors = PoolColorArray( 1, 1, 1, 1, 1, 0.257813, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1 )
+
+[node name="GameOver" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="ColorRect" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color( 0, 0, 0, 1 )
+
+[node name="Flash" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = SubResource( 1 )
+grad = SubResource( 2 )
+
+[node name="Label" type="Label" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -217.0
+margin_top = -55.0
+margin_right = -128.0
+margin_bottom = -39.0
+rect_scale = Vector2( 5, 5 )
+text = "GAME OVER"

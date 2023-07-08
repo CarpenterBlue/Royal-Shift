@@ -4,7 +4,8 @@
 script/source = "extends TextureButton
 
 func _pressed():
-	print(\"start\")"
+	get_tree().change_scene(\"res://Loop.tscn\")
+"
 
 [node name="Main" type="Control"]
 anchor_right = 1.0

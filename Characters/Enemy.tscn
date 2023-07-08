@@ -1,0 +1,93 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://Curves/Bounce.tres" type="Curve" id=2]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Node2D
+
+var state = \"state_normal\"
+var time = 0
+export var hp = 3
+var max_hp = hp
+export var dmg = 15
+
+export(Curve) var curve
+
+onready var drop = $\"%Drop\"
+
+func _ready():
+#	Events.connect(\"turn_passed\",self,\"attack\")
+	Events.connect(\"enemy_hit\",self,\"on_enemy_hit\")
+	var child = get_child(0)
+	
+func _process(delta):
+	
+	if has_method(state):
+		call(state)
+
+func attack():
+	var t = create_tween()
+	t.set_ease(Tween.EASE_OUT)
+	t.set_trans(Tween.TRANS_BOUNCE)
+	t.tween_property(self,\"position:y\",40,.2)
+	t.tween_interval(.2)
+	t.set_trans(Tween.TRANS_SINE)
+	t.set_ease(Tween.EASE_OUT)
+	t.tween_property(self,\"position:y\",0,.525)
+	t.tween_callback(Events,\"emit_signal\",[\"reset_inventory\"])
+	
+	var tt = create_tween()
+	tt.tween_interval(0.1)
+	tt.tween_callback(Events,\"emit_signal\",[\"player_took_damage\",dmg])
+	
+
+	
+func take_damage(val):
+	hp -= val
+	
+	
+	if hp <= 0:
+		kill()
+		return
+		
+	if hp <= max_hp / 2:
+		get_child(0).frame = 1
+	
+	var t = create_tween()
+	t.tween_method(self,\"bounce\",0.0,1.0,1)
+	
+	t.set_ease(Tween.EASE_OUT)
+	t.set_trans(Tween.TRANS_BOUNCE)
+	t.tween_property(self,\"position:y\",40,.2)
+	t.tween_interval(.2)
+	t.set_trans(Tween.TRANS_SINE)
+	t.set_ease(Tween.EASE_OUT)
+	t.tween_property(self,\"position:y\",0,.525)
+	t.tween_callback(Events,\"emit_signal\",[\"reset_inventory\"])
+	
+	var tt = create_tween()
+	tt.tween_interval(1.1)
+	tt.tween_callback(Events,\"emit_signal\",[\"player_took_damage\",dmg])
+
+func kill():
+	drop.queue_free()
+	Events.emit_signal(\"battle_ended\")
+	
+	var t = create_tween()
+	t.set_ease(Tween.EASE_OUT)
+	t.set_trans(Tween.TRANS_CUBIC)
+	t.tween_property($\"%Rewards\",\"position:y\",0,.35)
+	t.tween_callback(Events,\"emit_signal\",[\"reset_inventory\"])
+	
+	var tt = create_tween()
+	tt.tween_property(get_child(0),\"scale:x\",0,.5)
+	tt.set_parallel().tween_property(get_child(0),\"scale:y\",5,.5)
+
+func bounce(val):
+	var c = curve as Curve
+	position.y = c.interpolate(val) * -15
+"
+
+[node name="Enemy" type="Node2D"]
+script = SubResource( 1 )
+curve = ExtResource( 2 )
