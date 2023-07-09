@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/KingMapMarker.png-7610b42549f432ee098cc317dbd9ffba.stex"
+path="res://.import/KingMapMarker.png-7217db7659fd84acfc984e5b567d1898.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Player/KingMapMarker.png"
-dest_files=[ "res://.import/KingMapMarker.png-7610b42549f432ee098cc317dbd9ffba.stex" ]
+source_file="res://Map Markers/KingMapMarker.png"
+dest_files=[ "res://.import/KingMapMarker.png-7217db7659fd84acfc984e5b567d1898.stex" ]
 
 [params]
 

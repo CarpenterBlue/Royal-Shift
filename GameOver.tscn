@@ -22,10 +22,20 @@ colors = PoolColorArray( 1, 1, 1, 1, 1, 0.257813, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1 )
 [sub_resource type="GDScript" id=3]
 script/source = "extends Label
 
+func _ready():
+	text = str(\"Game Over\\n\\nThe roles were switched \", Global.cycles,\"x times.\\nClick to try again.\")
+	var t = create_tween()
+	percent_visible = 0
+	t.tween_property(self,\"percent_visible\",1.0,2.5)
+
 func _gui_input(event):
 	if event is InputEventMouseButton:
 		if event.is_pressed() and event.button_index == BUTTON_LEFT:
-			get_tree().change_scene(\"res://Main.tscn\")
+			if percent_visible == 1:
+				get_tree().change_scene(\"res://Main.tscn\")
+				Global.cycle = \"night\"
+				Global.cycles = 0
+				get_viewport().set_meta(\"drag\",false)
 "
 
 [node name="GameOver" type="Control"]

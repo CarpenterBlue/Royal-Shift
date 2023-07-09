@@ -12,8 +12,8 @@ func on_click(event):
 		var data = get_viewport().get_meta("drag",false)
 		
 		if data:
-			if has_method("upgrade"):
-				if data != self and data.type == type:
+			if data != self and data.type == type:
+				if has_method("upgrade"):
 					call("upgrade",data)
 					data.queue_free()
 					get_viewport().set_meta("drag",false)

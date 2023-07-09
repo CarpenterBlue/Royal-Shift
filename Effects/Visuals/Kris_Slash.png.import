@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/QueenMapMarker.png-e0ca6b769ba48a5f92ca69f0717c71cf.stex"
+path="res://.import/Kris_Slash.png-5392500d1ace221202b9079dde703c47.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Player/QueenMapMarker.png"
-dest_files=[ "res://.import/QueenMapMarker.png-e0ca6b769ba48a5f92ca69f0717c71cf.stex" ]
+source_file="res://Effects/Visuals/Kris_Slash.png"
+dest_files=[ "res://.import/Kris_Slash.png-5392500d1ace221202b9079dde703c47.stex" ]
 
 [params]
 

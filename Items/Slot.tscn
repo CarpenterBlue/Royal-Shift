@@ -8,7 +8,6 @@ script/source = "extends Control
 func _gui_input(event):
 	if event is InputEventMouseButton and event.is_pressed() and event.button_index == BUTTON_LEFT:
 		var data = get_viewport().get_meta(\"drag\",false)
-		print(data)
 		
 		if data:
 			var p = data.get_parent()
