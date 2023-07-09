@@ -9,6 +9,7 @@ func _gui_input(event):
 	if event is InputEventMouseButton:
 		if event.is_pressed() and event.button_index == BUTTON_LEFT:
 			get_tree().change_scene(\"res://Loop.tscn\")
+#			Events.emit_signal(\"transition_requested\")
 "
 
 [node name="Main" type="Control"]
@@ -18,7 +19,7 @@ anchor_bottom = 1.0
 [node name="Bg" type="ColorRect" parent="."]
 anchor_right = 1.0
 anchor_bottom = 1.0
-color = Color( 0.027451, 0.027451, 0.027451, 1 )
+color = Color( 0.00784314, 0, 0.0627451, 1 )
 
 [node name="Label" type="Label" parent="."]
 anchor_right = 1.0

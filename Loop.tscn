@@ -1,4 +1,4 @@
-[gd_scene load_steps=58 format=2]
+[gd_scene load_steps=50 format=2]
 
 [ext_resource path="res://Locations/LocationCave.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Loop/YellowTile.png" type="Texture" id=2]
@@ -15,10 +15,8 @@
 [ext_resource path="res://WallOfFire/HandsC4.png" type="Texture" id=13]
 [ext_resource path="res://WallOfFire/HandsC3.png" type="Texture" id=14]
 [ext_resource path="res://WallOfFire/HandsA4.png" type="Texture" id=15]
-[ext_resource path="res://Items/Scenes/ItemScimitar.tscn" type="PackedScene" id=16]
 [ext_resource path="res://Map Markers/KingMapMarker.png" type="Texture" id=17]
 [ext_resource path="res://WallOfFire/BG.png" type="Texture" id=18]
-[ext_resource path="res://Items/Slot.tscn" type="PackedScene" id=19]
 [ext_resource path="res://Map Markers/QueenMapMarker.png" type="Texture" id=20]
 [ext_resource path="res://Map Markers/DungeonIcon.png" type="Texture" id=21]
 [ext_resource path="res://Locations/LocationPyramid.tscn" type="PackedScene" id=22]
@@ -27,11 +25,6 @@
 [ext_resource path="res://Locations/LocationSkull.tscn" type="PackedScene" id=25]
 [ext_resource path="res://Locations/LocationOasis.tscn" type="PackedScene" id=26]
 [ext_resource path="res://Locations/LocationGate.tscn" type="PackedScene" id=27]
-[ext_resource path="res://Items/Scenes/ItemNet.tscn" type="PackedScene" id=28]
-[ext_resource path="res://Items/Scenes/ItemHourglass.tscn" type="PackedScene" id=29]
-[ext_resource path="res://Items/Scenes/ItemGem.tscn" type="PackedScene" id=30]
-[ext_resource path="res://Items/Scenes/ItemShield.tscn" type="PackedScene" id=31]
-[ext_resource path="res://Items/Scenes/ItemDagger.tscn" type="PackedScene" id=32]
 [ext_resource path="res://Loop/EndCap.png" type="Texture" id=33]
 
 [sub_resource type="GDScript" id=28]
@@ -192,7 +185,8 @@ func _ready():
 	global_position.x = player.global_position.x
 
 func _process(delta):
-	global_position.x = lerp(global_position.x,player.global_position.x,.05)
+#	global_position.x = lerp(global_position.x,player.global_position.x,.05)
+	global_position.x = player.global_position.x
 	
 "
 
@@ -255,17 +249,6 @@ func _process(delta):
 	position.x = clamp(position.x,0,p.rect_size.x)
 "
 
-[sub_resource type="GDScript" id=20]
-script/source = "extends GridContainer
-
-func _enter_tree():
-	hide()
-
-func _ready():
-	Events.connect(\"reset_inventory\",self,\"show\")
-	Events.connect(\"battle_ended\",self,\"hide\")
-"
-
 [sub_resource type="GDScript" id=12]
 script/source = "extends CanvasLayer
 
@@ -273,10 +256,10 @@ func _enter_tree():
 	show()
 "
 
-[sub_resource type="CanvasItemMaterial" id=8]
+[sub_resource type="CanvasItemMaterial" id=33]
 blend_mode = 2
 
-[sub_resource type="GDScript" id=7]
+[sub_resource type="GDScript" id=34]
 script/source = "extends Sprite
 
 export var radius := 1800.0
@@ -292,7 +275,10 @@ func play():
 	$AnimationPlayer.play(\"Trans\")
 
 func state_normal():
+#	var player = get_tree().get_nodes_in_group(\"Player\")
 	global_position.y = player.global_position.y
+#	global_position = get_parent().to_local(player.global_position)
+#	global_position = get_global_mouse_position()
 	update()
 
 func _process(delta):
@@ -303,7 +289,7 @@ func _draw():
 	draw_circle(Vector2(0,-40),radius,Color.black)
 "
 
-[sub_resource type="Animation" id=10]
+[sub_resource type="Animation" id=35]
 length = 0.001
 tracks/0/type = "value"
 tracks/0/path = NodePath("Wipe:radius")
@@ -318,7 +304,7 @@ tracks/0/keys = {
 "values": [ 1800 ]
 }
 
-[sub_resource type="Animation" id=9]
+[sub_resource type="Animation" id=36]
 resource_name = "Trans"
 length = 2.0
 tracks/0/type = "value"
@@ -336,7 +322,7 @@ tracks/0/keys = {
 
 [node name="Loop" type="TextureRect"]
 self_modulate = Color( 0.360784, 0.419608, 0.65098, 1 )
-margin_right = 3885.0
+margin_right = 1799.0
 margin_bottom = 540.0
 rect_min_size = Vector2( 1, 540 )
 texture = ExtResource( 2 )
@@ -391,282 +377,283 @@ script = SubResource( 22 )
 [node name="AnimatedSprite" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1142, 168 )
 frames = SubResource( 17 )
+frame = 2
 speed_scale = 2.0
 playing = true
 
 [node name="AnimatedSprite2" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1142, 198 )
 frames = SubResource( 18 )
+frame = 2
 speed_scale = 2.0
 playing = true
 
 [node name="AnimatedSprite3" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1142, 224 )
 frames = SubResource( 19 )
-frame = 2
 speed_scale = 2.0
 playing = true
 
 [node name="AnimatedSprite4" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1141, 252 )
 frames = SubResource( 17 )
+frame = 2
 speed_scale = 2.0
 playing = true
 
 [node name="AnimatedSprite5" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1141, 282 )
 frames = SubResource( 18 )
+frame = 2
 speed_scale = 2.0
 playing = true
 
 [node name="AnimatedSprite6" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1141, 308 )
 frames = SubResource( 19 )
-frame = 2
 speed_scale = 2.0
 playing = true
 
 [node name="AnimatedSprite7" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1141, 339 )
 frames = SubResource( 17 )
+frame = 2
 speed_scale = 2.0
 playing = true
 
 [node name="AnimatedSprite8" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1141, 369 )
 frames = SubResource( 18 )
+frame = 2
 speed_scale = 2.0
 playing = true
 
 [node name="AnimatedSprite9" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1141, 395 )
 frames = SubResource( 19 )
-frame = 2
 speed_scale = 2.0
 playing = true
 
 [node name="AnimatedSprite10" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1141, 428 )
 frames = SubResource( 17 )
-frame = 3
+frame = 1
 speed_scale = 2.0
 playing = true
 
 [node name="AnimatedSprite11" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1141, 458 )
 frames = SubResource( 18 )
-frame = 3
+frame = 1
 speed_scale = 2.0
 playing = true
 
 [node name="AnimatedSprite12" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1141, 484 )
 frames = SubResource( 19 )
-frame = 1
+frame = 3
 speed_scale = 2.0
 playing = true
 
 [node name="AnimatedSprite13" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1141, 513 )
 frames = SubResource( 17 )
-frame = 3
+frame = 1
 speed_scale = 2.0
 playing = true
 
 [node name="AnimatedSprite14" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1141, 543 )
 frames = SubResource( 18 )
-frame = 3
+frame = 1
 speed_scale = 2.0
 playing = true
 
 [node name="AnimatedSprite15" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1141, 569 )
 frames = SubResource( 19 )
-frame = 1
+frame = 3
 speed_scale = 2.0
 playing = true
 
 [node name="AnimatedSprite16" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1141, 601 )
 frames = SubResource( 17 )
-frame = 3
+frame = 1
 speed_scale = 2.0
 playing = true
 
 [node name="AnimatedSprite17" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1141, 631 )
 frames = SubResource( 18 )
-frame = 3
+frame = 1
 speed_scale = 2.0
 playing = true
 
 [node name="AnimatedSprite18" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1141, 657 )
 frames = SubResource( 19 )
-frame = 1
+frame = 3
 speed_scale = 2.0
 playing = true
 
 [node name="AnimatedSprite19" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1141, 687 )
 frames = SubResource( 17 )
-frame = 2
 speed_scale = 2.0
 playing = true
 
 [node name="AnimatedSprite20" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1141, 717 )
 frames = SubResource( 18 )
-frame = 2
 speed_scale = 2.0
 playing = true
 
 [node name="AnimatedSprite21" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1141, 743 )
 frames = SubResource( 19 )
+frame = 2
 speed_scale = 2.0
 playing = true
 
 [node name="AnimatedSprite22" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1130, 181 )
 frames = SubResource( 17 )
+frame = 2
 speed_scale = 2.0
 playing = true
 
 [node name="AnimatedSprite23" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1130, 211 )
 frames = SubResource( 18 )
+frame = 2
 speed_scale = 2.0
 playing = true
 
 [node name="AnimatedSprite24" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1130, 237 )
 frames = SubResource( 19 )
-frame = 1
+frame = 3
 speed_scale = 2.0
 playing = true
 
 [node name="AnimatedSprite25" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1129, 265 )
 frames = SubResource( 17 )
-frame = 3
+frame = 1
 speed_scale = 2.0
 playing = true
 
 [node name="AnimatedSprite26" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1129, 295 )
 frames = SubResource( 18 )
-frame = 3
+frame = 1
 speed_scale = 2.0
 playing = true
 
 [node name="AnimatedSprite27" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1129, 321 )
 frames = SubResource( 19 )
-frame = 1
+frame = 3
 speed_scale = 2.0
 playing = true
 
 [node name="AnimatedSprite28" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1129, 352 )
 frames = SubResource( 17 )
-frame = 3
+frame = 1
 speed_scale = 2.0
 playing = true
 
 [node name="AnimatedSprite29" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1129, 382 )
 frames = SubResource( 18 )
-frame = 3
+frame = 1
 speed_scale = 2.0
 playing = true
 
 [node name="AnimatedSprite30" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1129, 408 )
 frames = SubResource( 19 )
-frame = 1
+frame = 3
 speed_scale = 2.0
 playing = true
 
 [node name="AnimatedSprite31" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1129, 441 )
 frames = SubResource( 17 )
-frame = 2
 speed_scale = 2.0
 playing = true
 
 [node name="AnimatedSprite32" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1129, 471 )
 frames = SubResource( 18 )
-frame = 2
 speed_scale = 2.0
 playing = true
 
 [node name="AnimatedSprite33" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1129, 497 )
 frames = SubResource( 19 )
+frame = 2
 speed_scale = 2.0
 playing = true
 
 [node name="AnimatedSprite34" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1129, 526 )
 frames = SubResource( 17 )
-frame = 2
 speed_scale = 2.0
 playing = true
 
 [node name="AnimatedSprite35" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1129, 556 )
 frames = SubResource( 18 )
-frame = 2
 speed_scale = 2.0
 playing = true
 
 [node name="AnimatedSprite36" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1129, 582 )
 frames = SubResource( 19 )
+frame = 2
 speed_scale = 2.0
 playing = true
 
 [node name="AnimatedSprite37" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1129, 614 )
 frames = SubResource( 17 )
-frame = 2
 speed_scale = 2.0
 playing = true
 
 [node name="AnimatedSprite38" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1129, 644 )
 frames = SubResource( 18 )
-frame = 2
 speed_scale = 2.0
 playing = true
 
 [node name="AnimatedSprite39" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1129, 670 )
 frames = SubResource( 19 )
+frame = 2
 speed_scale = 2.0
 playing = true
 
 [node name="AnimatedSprite40" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1129, 700 )
 frames = SubResource( 17 )
-frame = 1
+frame = 3
 speed_scale = 2.0
 playing = true
 
 [node name="AnimatedSprite41" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1129, 730 )
 frames = SubResource( 18 )
-frame = 1
+frame = 3
 speed_scale = 2.0
 playing = true
 
 [node name="AnimatedSprite42" type="AnimatedSprite" parent="Force/ColorRect"]
 position = Vector2( 1129, 756 )
 frames = SubResource( 19 )
-frame = 3
+frame = 1
 speed_scale = 2.0
 playing = true
 
@@ -709,70 +696,6 @@ frames = SubResource( 30 )
 offset = Vector2( 0, 8 )
 script = SubResource( 15 )
 
-[node name="PlayerInventory" type="GridContainer" parent="GUI"]
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-margin_left = -463.0
-margin_top = 97.0
-margin_right = -309.0
-margin_bottom = 253.0
-columns = 4
-script = SubResource( 20 )
-
-[node name="Slot" parent="GUI/PlayerInventory" instance=ExtResource( 19 )]
-
-[node name="ItemScimitar" parent="GUI/PlayerInventory/Slot" instance=ExtResource( 16 )]
-
-[node name="Slot2" parent="GUI/PlayerInventory" instance=ExtResource( 19 )]
-margin_left = 79.0
-margin_right = 154.0
-
-[node name="Item" parent="GUI/PlayerInventory/Slot2" instance=ExtResource( 32 )]
-
-[node name="Slot3" parent="GUI/PlayerInventory" instance=ExtResource( 19 )]
-margin_left = 158.0
-margin_right = 233.0
-
-[node name="ItemGem" parent="GUI/PlayerInventory/Slot3" instance=ExtResource( 30 )]
-
-[node name="Slot4" parent="GUI/PlayerInventory" instance=ExtResource( 19 )]
-margin_left = 237.0
-margin_right = 312.0
-
-[node name="ItemHourglass" parent="GUI/PlayerInventory/Slot4" instance=ExtResource( 29 )]
-
-[node name="Slot5" parent="GUI/PlayerInventory" instance=ExtResource( 19 )]
-margin_top = 80.0
-margin_bottom = 156.0
-
-[node name="Item" parent="GUI/PlayerInventory/Slot5" instance=ExtResource( 28 )]
-margin_left = 3.0
-margin_top = -2.0
-margin_right = 3.0
-margin_bottom = -2.0
-
-[node name="Slot6" parent="GUI/PlayerInventory" instance=ExtResource( 19 )]
-margin_left = 79.0
-margin_top = 80.0
-margin_right = 154.0
-margin_bottom = 156.0
-
-[node name="Item" parent="GUI/PlayerInventory/Slot6" instance=ExtResource( 31 )]
-
-[node name="Slot7" parent="GUI/PlayerInventory" instance=ExtResource( 19 )]
-margin_left = 158.0
-margin_top = 80.0
-margin_right = 233.0
-margin_bottom = 156.0
-
-[node name="Slot8" parent="GUI/PlayerInventory" instance=ExtResource( 19 )]
-margin_left = 237.0
-margin_top = 80.0
-margin_right = 312.0
-margin_bottom = 156.0
-
 [node name="Transition" type="CanvasLayer" parent="."]
 layer = 3
 visible = false
@@ -796,15 +719,15 @@ gui_disable_input = true
 margin_right = 960.0
 margin_bottom = 540.0
 mouse_filter = 2
-color = Color( 0, 0, 0, 1 )
+color = Color( 1, 0.184314, 0.396078, 1 )
 
 [node name="Wipe" type="Sprite" parent="Transition/ViewportContainer/Viewport/Position2D"]
-material = SubResource( 8 )
+material = SubResource( 33 )
 position = Vector2( 480, 270 )
-script = SubResource( 7 )
+script = SubResource( 34 )
 radius = 1800
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="Transition/ViewportContainer/Viewport/Position2D/Wipe"]
 root_node = NodePath("../..")
-anims/RESET = SubResource( 10 )
-anims/Trans = SubResource( 9 )
+anims/RESET = SubResource( 35 )
+anims/Trans = SubResource( 36 )

@@ -6,8 +6,7 @@
 resource_local_to_scene = true
 script/source = "extends InventoryItem
 
-
-var level = 3
+var level = 1
 
 func use(enemy):
 	var node = preload(\"res://Effects/Slash.tscn\").instance()
@@ -15,7 +14,7 @@ func use(enemy):
 	enemy.take_damage(level)
 
 func upgrade(data):
-	level += data.level-1
+	level += data.level
 	$Label.text = str(\"+\",level-1)
 	$Label.show()
 "
@@ -25,12 +24,14 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 script = SubResource( 5 )
 type = "Scimitar"
+cooldown = 1
 
 [node name="Sprite" type="Sprite" parent="."]
 position = Vector2( 35, 37 )
 texture = ExtResource( 1 )
 
 [node name="Label" type="Label" parent="."]
+visible = false
 margin_left = 41.0
 margin_top = 12.0
 margin_right = 63.0

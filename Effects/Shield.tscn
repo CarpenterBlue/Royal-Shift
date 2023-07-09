@@ -5,7 +5,7 @@
 [sub_resource type="GDScript" id=1]
 script/source = "extends Node2D
 
-var absorption = 2
+var absorption = 0
 
 func _ready():
 	add_to_group(\"player_shields\")
@@ -29,7 +29,7 @@ tracks/0/imported = false
 tracks/0/enabled = true
 tracks/0/keys = {
 "times": PoolRealArray( 0, 1 ),
-"transitions": PoolRealArray( 1, 1 ),
+"transitions": PoolRealArray( 0.15932, 1 ),
 "update": 0,
 "values": [ Vector2( 1, 1 ), Vector2( 2, 2 ) ]
 }
@@ -41,7 +41,7 @@ tracks/1/imported = false
 tracks/1/enabled = true
 tracks/1/keys = {
 "times": PoolRealArray( 0, 1 ),
-"transitions": PoolRealArray( 1, 1 ),
+"transitions": PoolRealArray( 0.225313, 1 ),
 "update": 0,
 "values": [ Color( 1, 1, 1, 1 ), Color( 1, 1, 1, 0 ) ]
 }
@@ -88,8 +88,9 @@ tracks/1/keys = {
 script = SubResource( 1 )
 
 [node name="Sprite" type="Sprite" parent="."]
-position = Vector2( 457, 269 )
+position = Vector2( 470, 260 )
 texture = ExtResource( 1 )
+offset = Vector2( 0, -32 )
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 autoplay = "New Anim"

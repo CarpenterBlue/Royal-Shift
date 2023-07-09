@@ -14,10 +14,14 @@ func use(enemy):
 		enemy.get_parent().add_child(node)
 		node.absorption = level
 		level -= 1
+		
+	var t = enemy.create_tween()
+	t.tween_callback(enemy,\"take_damage\",[0]).set_delay(.1)
+#		enemy.take_damage(0)
 
 func upgrade(data):
 	level += data.level
-	$Label.text = str(\"+\",level-1)
+	$Label.text = str(level)
 	$Label.show()
 "
 
@@ -32,11 +36,11 @@ position = Vector2( 35, 37 )
 texture = ExtResource( 1 )
 
 [node name="Label" type="Label" parent="."]
-visible = false
 margin_left = 41.0
 margin_top = 12.0
 margin_right = 63.0
 margin_bottom = 26.0
+text = "1"
 align = 1
 valign = 1
 autowrap = true

@@ -34,6 +34,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 script = SubResource( 5 )
 type = "Dagger"
+cooldown = 2
 
 [node name="Sprite" type="Sprite" parent="."]
 position = Vector2( 35, 37 )

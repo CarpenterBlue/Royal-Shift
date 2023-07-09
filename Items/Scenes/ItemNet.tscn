@@ -13,6 +13,8 @@ func use(enemy):
 	var node = preload(\"res://Effects/Slash.tscn\").instance()
 	enemy.get_parent().add_child(node)
 	enemy.dmg -= (level * 2)
+	enemy.dmg = 0 if enemy.dmg < 0 else enemy.dmg
+	enemy.take_damage(0)
 
 func upgrade(data):
 	level += data.level
