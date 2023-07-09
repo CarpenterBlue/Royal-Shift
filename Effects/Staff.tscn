@@ -1,0 +1,32 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Items/Cooldown.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Effects/Visuals/StaffBoost.png" type="Texture" id=2]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Node2D
+
+var dmg = 0
+var target
+var is_on_cooldown = true setget go_off
+
+func go_off(value):
+	queue_free()
+	is_on_cooldown = value
+	target.take_extra_damage(dmg)
+	Events.emit_signal(\"push_back_firewall\",dmg)
+"
+
+[node name="Staff" type="Node2D"]
+script = SubResource( 1 )
+
+[node name="Sprite" type="Sprite" parent="."]
+position = Vector2( 613, 199 )
+texture = ExtResource( 2 )
+
+[node name="Cooldown" parent="." instance=ExtResource( 1 )]
+margin_left = 582.0
+margin_top = 197.0
+margin_right = 657.0
+margin_bottom = 273.0
+turns = 2

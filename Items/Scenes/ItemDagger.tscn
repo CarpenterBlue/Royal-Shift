@@ -22,6 +22,8 @@ func use(enemy):
 		enemy.get_parent().add_child(node2)
 	
 	enemy.take_damage(level)
+	
+
 
 func upgrade(data):
 	level += data.level
@@ -29,7 +31,7 @@ func upgrade(data):
 	$Label.show()
 "
 
-[node name="Item" type="Control"]
+[node name="ItemDagger" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 script = SubResource( 5 )

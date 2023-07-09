@@ -1,0 +1,195 @@
+[gd_scene load_steps=12 format=2]
+
+[ext_resource path="res://Items/Scenes/ItemScimitar.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Items/Slot.tscn" type="PackedScene" id=3]
+[ext_resource path="res://Items/Scenes/ItemGem.tscn" type="PackedScene" id=4]
+[ext_resource path="res://Items/Scenes/ItemHourglass.tscn" type="PackedScene" id=6]
+[ext_resource path="res://Items/Scenes/ItemNet.tscn" type="PackedScene" id=7]
+
+[sub_resource type="GDScript" id=3]
+script/source = "extends GridContainer
+
+export var affinity = \"day\"
+
+func _enter_tree():
+	hide()
+
+func _ready():
+	Events.connect(\"reset_inventory\",self,\"display\")
+	Events.connect(\"battle_ended\",self,\"hide\")
+
+func display():
+	if Global.cycle == affinity:
+		show()
+"
+
+[sub_resource type="GDScript" id=21]
+script/source = "extends Control
+
+export var accepts_hourglass = true
+
+func _gui_input(event):
+	if event is InputEventMouseButton and event.is_pressed() and event.button_index == BUTTON_LEFT:
+		var data = get_viewport().get_meta(\"drag\",false)
+		
+		if not accepts_hourglass:
+			if data and data.type == \"Hourglass\":
+				return
+		
+		if data:
+			var p = data.get_parent()
+			p.remove_child(data)
+			add_child(data)
+			data.show()
+			get_viewport().set_meta(\"drag\",false)
+			data.rect_size = rect_size
+			data.rect_position = Vector2()
+"
+
+[sub_resource type="GDScript" id=5]
+resource_local_to_scene = true
+script/source = "extends InventoryItem
+
+var level = 1
+
+func use(enemy):
+	var node = preload(\"res://Effects/Slash.tscn\").instance()
+	enemy.get_parent().add_child(node)
+	enemy.take_damage(level)
+
+func upgrade(data):
+	level += data.level
+	$Label.text = str(\"+\",level-1)
+	$Label.show()
+"
+
+[sub_resource type="GDScript" id=23]
+resource_local_to_scene = true
+script/source = "extends InventoryItem
+
+
+var level = 1
+
+func use(enemy):
+	var node = preload(\"res://Effects/Slash.tscn\").instance()
+	Events.emit_signal(\"push_back_firewall\",level * 55)
+#	enemy.get_parent().add_child(node)
+	enemy.take_damage(0)
+
+func upgrade(data):
+	level += data.level
+	$Label.text = str(\"+\",level-1)
+	$Label.show()
+"
+
+[sub_resource type="GDScript" id=24]
+resource_local_to_scene = true
+script/source = "extends InventoryItem
+
+
+var level = 1
+
+func use(enemy):
+	var node = preload(\"res://Effects/Slash.tscn\").instance()
+	enemy.get_parent().add_child(node)
+	enemy.dmg -= (level * 2)
+	enemy.dmg = 0 if enemy.dmg < 0 else enemy.dmg
+	enemy.take_damage(0)
+
+func upgrade(data):
+	level += data.level
+	$Label.text = str(\"+\",level-1)
+	$Label.show()
+"
+
+[sub_resource type="GDScript" id=22]
+resource_local_to_scene = true
+script/source = "extends InventoryItem
+
+
+var level = 1
+
+func use(enemy):
+	var node = preload(\"res://Effects/Gem.tscn\").instance()
+	enemy.get_parent().add_child(node)
+	enemy.take_damage(level * 10)
+	queue_free()
+
+func upgrade(data):
+	level += data.level
+	$Label.text = str(\"+\",level-1)
+	$Label.show()
+"
+
+[node name="PlayerInventoryNight" type="GridContainer"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -463.0
+margin_top = 97.0
+margin_right = -151.0
+margin_bottom = 253.0
+columns = 4
+script = SubResource( 3 )
+affinity = "night"
+
+[node name="Slot" parent="." instance=ExtResource( 3 )]
+script = SubResource( 21 )
+
+[node name="ItemScimitar" parent="Slot" instance=ExtResource( 2 )]
+script = SubResource( 5 )
+
+[node name="Slot2" parent="." instance=ExtResource( 3 )]
+margin_left = 79.0
+margin_right = 154.0
+script = SubResource( 21 )
+
+[node name="Slot3" parent="." instance=ExtResource( 3 )]
+margin_left = 158.0
+margin_right = 233.0
+script = SubResource( 21 )
+
+[node name="Slot4" parent="." instance=ExtResource( 3 )]
+margin_left = 237.0
+margin_right = 312.0
+script = SubResource( 21 )
+
+[node name="ItemHourglass" parent="Slot4" instance=ExtResource( 6 )]
+script = SubResource( 23 )
+
+[node name="Slot5" parent="." instance=ExtResource( 3 )]
+margin_top = 80.0
+margin_bottom = 156.0
+script = SubResource( 21 )
+
+[node name="ItemNet" parent="Slot5" instance=ExtResource( 7 )]
+margin_left = 3.0
+margin_top = -2.0
+margin_right = 3.0
+margin_bottom = -2.0
+script = SubResource( 24 )
+
+[node name="Slot6" parent="." instance=ExtResource( 3 )]
+margin_left = 79.0
+margin_top = 80.0
+margin_right = 154.0
+margin_bottom = 156.0
+script = SubResource( 21 )
+
+[node name="Slot7" parent="." instance=ExtResource( 3 )]
+margin_left = 158.0
+margin_top = 80.0
+margin_right = 233.0
+margin_bottom = 156.0
+script = SubResource( 21 )
+
+[node name="Slot8" parent="." instance=ExtResource( 3 )]
+margin_left = 237.0
+margin_top = 80.0
+margin_right = 312.0
+margin_bottom = 156.0
+script = SubResource( 21 )
+
+[node name="ItemGem" parent="Slot8" instance=ExtResource( 4 )]
+script = SubResource( 22 )

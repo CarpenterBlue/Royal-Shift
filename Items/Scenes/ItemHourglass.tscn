@@ -2,7 +2,7 @@
 
 [ext_resource path="res://Items/Visuals/Hourglass.png" type="Texture" id=1]
 
-[sub_resource type="GDScript" id=5]
+[sub_resource type="GDScript" id=23]
 resource_local_to_scene = true
 script/source = "extends InventoryItem
 
@@ -24,7 +24,7 @@ func upgrade(data):
 [node name="ItemHourglass" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-script = SubResource( 5 )
+script = SubResource( 23 )
 type = "Hourglass"
 
 [node name="Sprite" type="Sprite" parent="."]

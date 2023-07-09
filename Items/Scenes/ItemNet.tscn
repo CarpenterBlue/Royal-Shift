@@ -22,7 +22,7 @@ func upgrade(data):
 	$Label.show()
 "
 
-[node name="Item" type="Control"]
+[node name="ItemNet" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 script = SubResource( 5 )

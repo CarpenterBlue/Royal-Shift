@@ -9,7 +9,9 @@ script/source = "extends InventoryItem
 var level = 1
 
 func use(enemy):
-	var node = preload(\"res://Effects/Slash.tscn\").instance()
+	var node = preload(\"res://Effects/Staff.tscn\").instance()
+	node.dmg = level * 10
+	node.target = enemy
 	enemy.get_parent().add_child(node)
 	enemy.take_damage(0)
 
@@ -19,12 +21,12 @@ func upgrade(data):
 	$Label.show()
 "
 
-[node name="ItemScimitar" type="Control"]
+[node name="ItemStaff" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 script = SubResource( 5 )
-type = "Scimitar"
-cooldown = 1
+type = "Staff"
+cooldown = 4
 
 [node name="Sprite" type="Sprite" parent="."]
 position = Vector2( 35, 37 )

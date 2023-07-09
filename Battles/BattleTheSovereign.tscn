@@ -1,0 +1,303 @@
+[gd_scene load_steps=23 format=2]
+
+[ext_resource path="res://Characters/Enemy.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Characters/Visuals/Beetle_King_Art.png" type="Texture" id=2]
+[ext_resource path="res://Items/Scenes/ItemScimitar.tscn" type="PackedScene" id=3]
+[ext_resource path="res://Items/Slot.tscn" type="PackedScene" id=4]
+[ext_resource path="res://Characters/Visuals/Beetle_King_Art_damaged.png" type="Texture" id=5]
+[ext_resource path="res://Hieroglyphs.png" type="Texture" id=6]
+[ext_resource path="res://Characters/Visuals/Mantis_Queen_Art.png" type="Texture" id=7]
+[ext_resource path="res://Characters/Visuals/Mantis_Queen_Art_Damaged.png" type="Texture" id=8]
+
+[sub_resource type="GDScript" id=7]
+script/source = "extends CanvasLayer
+
+func _ready():
+	Events.connect(\"game_over\",self,\"queue_free\")
+	Events.emit_signal(\"reset_inventory\")
+"
+
+[sub_resource type="GDScript" id=10]
+script/source = "extends ColorRect
+
+export(Gradient) var grad
+
+func _ready():
+	Events.connect(\"player_took_damage\",self,\"flash\")
+	
+func flash(val):
+	var t = create_tween()
+	t.tween_method(self,\"roll_color\",0.0,1.0,.25)
+	
+	
+func roll_color(val):
+	color = grad.interpolate(val)
+"
+
+[sub_resource type="Gradient" id=11]
+interpolation_mode = 1
+offsets = PoolRealArray( 0, 0.186508, 0.589286, 0.85119 )
+colors = PoolColorArray( 1, 1, 1, 1, 1, 0.214844, 0.214844, 1, 0.17395, 0, 0.292969, 1, 0.00784314, 0, 0.0627451, 1 )
+
+[sub_resource type="Shader" id=14]
+code = "shader_type canvas_item;
+
+void fragment(){
+	vec2 uv = UV;
+	vec2 offset = vec2(0,TIME*.25);
+	vec4 tex = texture(TEXTURE,uv+offset);
+	COLOR = tex;
+	
+}"
+
+[sub_resource type="ShaderMaterial" id=15]
+shader = SubResource( 14 )
+
+[sub_resource type="Shader" id=18]
+resource_local_to_scene = true
+code = "shader_type canvas_item;
+uniform float val = 0;
+uniform vec4 col : hint_color;
+
+void fragment(){
+	vec4 tex = texture(TEXTURE,UV);
+	COLOR = mix(tex,col,val);
+	COLOR.a = tex.a;
+}"
+
+[sub_resource type="ShaderMaterial" id=19]
+resource_local_to_scene = true
+shader = SubResource( 18 )
+shader_param/val = 0.0
+shader_param/col = Color( 1, 0, 0.345098, 1 )
+
+[sub_resource type="GDScript" id=13]
+script/source = "extends Position2D
+
+
+func _process(delta):
+	var time = Time.get_ticks_msec()
+	
+	scale.y = sin(time*.02) * .005 + 1
+"
+
+[sub_resource type="SpriteFrames" id=21]
+animations = [ {
+"frames": [ ExtResource( 2 ), ExtResource( 5 ) ],
+"loop": true,
+"name": "day",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 7 ), ExtResource( 8 ) ],
+"loop": true,
+"name": "night",
+"speed": 5.0
+} ]
+
+[sub_resource type="GDScript" id=12]
+script/source = "extends AnimatedSprite
+
+onready var p = get_parent().get_parent()
+
+func _process(delta):
+	if p.hp <= p.max_hp / 2.0:
+		frame = 1
+		offset.x = rand_range(-1,1)
+		offset.y = rand_range(-1,1)
+		
+
+"
+
+[sub_resource type="GDScript" id=20]
+script/source = "extends Node2D
+
+export var mantis_base_hp = 20
+export var beetle_base_hp = 30
+
+export var mantis_base_dmg = 30
+export var beetle_base_dmg = 12
+
+onready var boss = $\"%Enemy\"
+onready var p = get_parent()
+
+func _ready():
+	var mult = (Global.cycles+1)
+	
+	if Global.cycle == \"night\":
+		# Mantis
+		p.animation = \"night\"
+		p.offset.y = -40
+		boss.get_node(\"Position2D\").position.y += 60
+		boss.hp = mantis_base_hp * mult
+		boss.dmg = mantis_base_dmg * mult
+		boss.enemy_name = \"The Sovereign Mantis\"
+	else:
+		# Beetle
+		boss.enemy_name = \"The Sovereign Scarab\"
+		boss.hp = beetle_base_hp * mult + 50
+		boss.dmg = beetle_base_dmg * mult
+
+	boss.get_node(\"FollowBar\").update_values()
+"
+
+[sub_resource type="GDScript" id=3]
+script/source = "extends Control
+
+onready var enemy = $\"%Enemy\"
+
+func _gui_input(event):
+	if event is InputEventMouseButton and event.is_pressed():
+		var data = get_viewport().get_meta(\"drag\",false)
+		
+
+		if data:
+			if is_instance_valid(enemy) and not data.is_on_cooldown:
+				use(data)
+				get_viewport().set_meta(\"drag\",false)
+				
+			else:
+				data.show()
+				get_viewport().set_meta(\"drag\",false)
+				
+
+func use(data):
+	if data.has_method(\"use\"):
+		data.use($\"%Enemy\")
+		if data.cooldown > 0:
+			data.is_on_cooldown = true
+			var cooldown = preload(\"res://Items/Cooldown.tscn\").instance()
+			cooldown.turns = data.cooldown
+			data.add_child(cooldown)
+		
+	data.show()
+	data.get_parent()
+	data.get_parent().get_parent().hide()
+"
+
+[sub_resource type="GDScript" id=17]
+script/source = "extends Node2D
+
+func _ready():
+	connect(\"child_exiting_tree\",self,\"finish\")
+	
+func finish(value):
+#	owner.queue_free()
+	hide()
+	Events.emit_signal(\"transition_requested\")
+	var t = create_tween()
+	t.tween_interval(1)
+	t.tween_callback(owner,\"queue_free\")
+	Events.emit_signal(\"battle_ended\")
+	
+"
+
+[sub_resource type="GDScript" id=16]
+script/source = "extends Control
+
+func _ready():
+	if not visible:
+		queue_free()
+	Events.connect(\"reset_inventory\",self,\"show\")
+"
+
+[node name="BattleScreen" type="CanvasLayer"]
+script = SubResource( 7 )
+
+[node name="BG" type="ColorRect" parent="."]
+show_behind_parent = true
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -181.0
+margin_top = -119.0
+margin_right = 1141.0
+margin_bottom = 659.0
+color = Color( 0.00784314, 0, 0.0627451, 1 )
+script = SubResource( 10 )
+grad = SubResource( 11 )
+
+[node name="TextureRect" type="TextureRect" parent="."]
+material = SubResource( 15 )
+anchor_right = 1.0
+anchor_bottom = 1.0
+texture = ExtResource( 6 )
+expand = true
+stretch_mode = 2
+
+[node name="Enemy" parent="." groups=["enemy"] instance=ExtResource( 1 )]
+unique_name_in_owner = true
+material = SubResource( 19 )
+is_final_boss = true
+hp = 4
+
+[node name="Position2D" type="Position2D" parent="Enemy"]
+use_parent_material = true
+position = Vector2( 592, 371 )
+script = SubResource( 13 )
+
+[node name="Sprite" type="AnimatedSprite" parent="Enemy/Position2D"]
+use_parent_material = true
+position = Vector2( -8, -138 )
+frames = SubResource( 21 )
+animation = "day"
+script = SubResource( 12 )
+
+[node name="Enter" type="Node2D" parent="Enemy/Position2D/Sprite"]
+script = SubResource( 20 )
+
+[node name="Drop" type="Control" parent="." groups=["drop"]]
+unique_name_in_owner = true
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -9.0
+margin_right = 9.0
+margin_bottom = -172.0
+script = SubResource( 3 )
+
+[node name="Rewards" type="Node2D" parent="."]
+unique_name_in_owner = true
+position = Vector2( 0, -380 )
+script = SubResource( 17 )
+
+[node name="ItemScimitar" parent="Rewards" instance=ExtResource( 3 )]
+margin_left = 222.0
+margin_top = 202.0
+margin_right = 291.0
+margin_bottom = 273.0
+rect_min_size = Vector2( 54, 54 )
+
+[node name="Label" type="Label" parent="Rewards"]
+margin_left = 128.0
+margin_top = 159.0
+margin_right = 401.0
+margin_bottom = 175.0
+text = "You may choose only one reward."
+
+[node name="Label2" type="Label" parent="Rewards"]
+margin_left = 547.0
+margin_top = 159.0
+margin_right = 820.0
+margin_bottom = 175.0
+text = "Dispose Of Unwanted Item"
+align = 1
+
+[node name="Slot" parent="Rewards" instance=ExtResource( 4 )]
+margin_left = 645.0
+margin_top = 199.0
+margin_right = 720.0
+margin_bottom = 275.0
+
+[node name="Sprite" type="Sprite" parent="."]
+
+[node name="Debug" type="Control" parent="."]
+visible = false
+margin_right = 40.0
+margin_bottom = 40.0
+script = SubResource( 16 )
+
+[node name="Slot" parent="Debug" instance=ExtResource( 4 )]
+margin_left = 881.0
+margin_top = 226.0
+margin_right = 956.0
+margin_bottom = 302.0
+
+[node name="ItemScimitar" parent="Debug/Slot" instance=ExtResource( 3 )]

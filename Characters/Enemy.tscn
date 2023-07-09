@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://Curves/Bounce.tres" type="Curve" id=2]
 [ext_resource path="res://Ui/healthbar.png" type="Texture" id=3]
@@ -26,10 +26,13 @@ script/source = "extends Node2D
 
 var state = \"state_normal\"
 var time = 0
+export var is_final_boss = false
 export var hp = 3
 onready var max_hp = hp
 export var dmg = 15
 export var enemy_name : String
+
+var final_boss_selected_slot
 
 export(Curve) var curve
 
@@ -41,7 +44,7 @@ signal attacked()
 
 func _ready():
 	Events.connect(\"enemy_hit\",self,\"on_enemy_hit\")
-	
+
 func attack():
 	var t = create_tween()
 	t.set_ease(Tween.EASE_OUT)
@@ -52,38 +55,125 @@ func attack():
 	t.set_ease(Tween.EASE_OUT)
 	t.tween_property(self,\"position:y\",0,.525)
 	t.tween_callback(Events,\"emit_signal\",[\"reset_inventory\"])
-	
+
 	var tt = create_tween()
 	tt.tween_interval(0.1)
 	tt.tween_callback(Events,\"emit_signal\",[\"player_took_damage\",dmg])
 
 func take_extra_damage(val):
 	hp -= val
-	
+
 	if hp <= 0:
 		kill()
 		return
-	
-	tween_damage()
+
+	tween_damage(val)
 
 
 func take_damage(val):
 	hp -= val
-	
-	tween_damage()
-	
+
+	tween_damage(val)
+
 	if hp <= 0:
 		kill()
 		return
-	
+
 	emit_signal(\"attacked\")
-	
-	
-	var t = create_tween()
-	
+
+
+
 	if val > 0:
+		var t = create_tween()
 		t.tween_method(self,\"bounce\",0.0,1.0,1)
-	
+
+	if not is_final_boss:
+		do_normal_attack()
+	else:
+		do_final_boss_stuff()
+
+func do_final_boss_stuff():
+	var t = create_tween()
+	t.tween_callback(self,\"final_boss_attack\")
+
+	var color_rect = ColorRect.new()
+	Global.add_child(color_rect)
+	color_rect.rect_size = Vector2(960,540)
+	color_rect.color = Color(0,0,0,0)
+
+	var col = Color(\"020010\")
+	col.a = .8
+	t.tween_property(color_rect,\"color\",col,.85)
+	t.tween_interval(1.85)
+	t.tween_property(color_rect,\"color\",Color(0,0,0,0),.85)
+	t.tween_callback(color_rect,\"queue_free\")
+#	t.tween_callback(Events,\"emit_signal\",[\"reset_inventory\"])
+#	t.tween_callback(Events,\"emit_signal\",[\"player_took_damage\",dmg])
+
+func final_boss_attack():
+	var copy
+
+	if Global.cycle == \"night\":
+		copy = Global.get_node(\"PlayerInventoryDay\").duplicate()
+		copy.name = \"Mirror\"
+		Global.add_child(copy)
+		copy.show()
+		copy.rect_position = Vector2(290,-185)
+
+
+	var t = create_tween()
+	t.set_ease(Tween.EASE_IN_OUT)
+	t.set_trans(Tween.TRANS_CUBIC)
+	t.tween_property(copy,\"rect_position\",Vector2(290,185),1)
+	t.tween_callback(self,\"pick_item\",[copy])
+
+func pick_item(copy):
+	randomize()
+	var picker = preload(\"res://FinalBoss/Picker.tscn\").instance()
+	picker.hide()
+	copy.add_child(picker)
+	var slots = copy.get_children()
+	var selected_slot
+
+	var t = create_tween()
+
+	for i in 20:
+		var pick = copy.get_child(rand_range(0,slots.size()-1))
+		selected_slot = pick
+
+		t.tween_interval(.055)
+		t.tween_property(picker,\"position\",pick.rect_position+Vector2(38,38),0)
+		t.tween_callback(picker,\"show\")
+	final_boss_selected_slot = selected_slot
+	t.tween_callback(self,\"final_boss_attack_slide_away\",[copy])
+
+
+func final_boss_attack_slide_away(copy):
+	var t = create_tween()
+	t.tween_interval(1)
+	t.set_ease(Tween.EASE_IN_OUT)
+	t.set_trans(Tween.TRANS_CUBIC)
+	t.tween_property(copy,\"rect_position:y\",540,.5)
+	if final_boss_selected_slot.get_child_count() > 0:
+
+		t.tween_callback(self,\"final_boss_use_item\",[copy])
+	else:
+		t.tween_callback(self,\"do_normal_attack\")
+		t.tween_callback(copy,\"queue_free\")
+
+func final_boss_use_item(copy):
+	var t = create_tween()
+	t.tween_interval(.1)
+	var item = final_boss_selected_slot.get_child(0)
+	if item.has_method(\"use_as_enemy\"):
+		t.tween_callback(item,\"use_as_enemy\")
+	t.tween_callback(copy,\"queue_free\")
+	t.tween_callback(Events,\"emit_signal\",[\"reset_inventory\"])
+
+
+func do_normal_attack():
+	var t = create_tween()
+	t.tween_interval(1)
 	t.set_ease(Tween.EASE_OUT)
 	t.set_trans(Tween.TRANS_BOUNCE)
 	t.tween_property(self,\"position:y\",40,.2)
@@ -92,23 +182,23 @@ func take_damage(val):
 	t.set_ease(Tween.EASE_OUT)
 	t.tween_property(self,\"position:y\",0,.525)
 	t.tween_callback(Events,\"emit_signal\",[\"reset_inventory\"])
-	
+
 	var tt = create_tween()
 	tt.tween_interval(1.1)
 	tt.tween_callback(Events,\"emit_signal\",[\"player_took_damage\",dmg])
 
 func kill():
 	drop.queue_free()
-	
+
 	Events.emit_signal(\"enemy_defeated\",40)
 #	Events.emit_signal(\"battle_ended\")
-	
+
 	var t = rewards.create_tween()
 	t.set_ease(Tween.EASE_OUT)
 	t.set_trans(Tween.TRANS_CUBIC)
 	t.tween_property(rewards,\"position:y\",0,.35)
 	t.tween_callback(Events,\"emit_signal\",[\"reset_inventory\"])
-	
+
 	var tt = create_tween()
 	tt.tween_property(sprite,\"scale:x\",0.0,.5)
 	tt.parallel().tween_property(sprite,\"scale:y\",5,.5)
@@ -119,13 +209,15 @@ func kill():
 func tween_shader(val):
 	material.set_shader_param(\"val\",val)
 
-func tween_damage():
+func tween_damage(dmg = 0):
+	if dmg == 0:
+		return
 	var t = create_tween()
 	t.set_ease(Tween.EASE_OUT)
 	t.set_trans(Tween.TRANS_EXPO)
 	t.tween_interval(.25)
 	t.tween_property($FollowBar,\"value\",hp,.5)
-	
+
 	var tt = create_tween()
 	tt.set_speed_scale(4)
 	tt.set_loops(4)
@@ -133,7 +225,7 @@ func tween_damage():
 	tt.tween_interval(.25)
 	tt.tween_callback($FollowBar/HealthBar,\"show\")
 	tt.tween_interval(.25)
-	
+
 func bounce(val):
 	var c = curve as Curve
 	position.y = c.interpolate(val) * -15
@@ -144,13 +236,16 @@ script/source = "extends TextureProgress
 
 func _ready():
 	set_as_toplevel(true)
+	update_values()
+	
+	
+
+func update_values():
 	max_value = owner.hp
 	value = owner.hp
 	$HealthBar.max_value = max_value
 	$HealthBar.value = value
-	
-	
-
+	$EnemyName.text = str(owner.enemy_name).to_upper()
 "
 
 [sub_resource type="GDScript" id=6]
@@ -158,14 +253,6 @@ script/source = "extends TextureProgress
 
 func _process(delta):
 	value = owner.hp
-	update()
-"
-
-[sub_resource type="GDScript" id=8]
-script/source = "extends Label
-
-func _ready():
-	text = str(owner.enemy_name).to_upper()
 "
 
 [sub_resource type="GDScript" id=7]
@@ -208,14 +295,13 @@ tint_progress = Color( 1, 0.184314, 0.396078, 1 )
 script = SubResource( 6 )
 
 [node name="EnemyName" type="Label" parent="FollowBar"]
-margin_left = 9.0
+margin_left = -101.0
 margin_top = 168.0
-margin_right = 159.0
+margin_right = 269.0
 margin_bottom = 184.0
 text = "ENEMY NAME"
 align = 1
 valign = 1
-script = SubResource( 8 )
 
 [node name="Numericals" type="Label" parent="FollowBar"]
 margin_left = 9.0
